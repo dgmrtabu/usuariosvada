@@ -9,4 +9,4 @@ router.put('/', usuariosPut);
 router.delete('/', usuariosDelete);
 router.patch('/', usuariosPatch);
 
-module.exports = router;
+module.exports = router; 
