@@ -1,4 +1,8 @@
 const { response, request } = require('express');
+const bcryptjs = require('bcryptjs');
+
+const Usuario = require('../model/usuario');
+const { validationResult } = require('express-validator');
 
 const usuariosGet = (req = request, res = response) => {
     const { q, nombre = 'No name', apikey, page = 1, limit = 10 } = req.query;
@@ -12,14 +16,34 @@ const usuariosGet = (req = request, res = response) => {
     });
 };
 
-const usuariosPost = (req, res = response) => {
+const usuariosPost = async(req, res = response) => {
 
-    // const body = req.body;
-    const { nombre, edad } = req.body;
+    const errorsValidation = validationResult(req);
+
+    if (!errorsValidation.isEmpty()) {
+        return res.status(400).json(errorsValidation);
+    }
+
+    const { nombre, correo, password, rol } = req.body;
+    const usuario = new Usuario({ nombre, correo, password, rol });
+
+    //Verificar si el correo existe
+    const existeEmail = await Usuario.findOne({ correo });
+    if (existeEmail) {
+        return res.status(400).json({
+            msg: 'El correo ya esta registrado'
+        });
+    }
+
+    //Encriptar la contrasena
+    const salt = bcryptjs.genSaltSync();
+    usuario.password = bcryptjs.hashSync(password, salt);
+
+    //Guardando registro
+    await usuario.save();
+
     res.json({
-        msg: 'post API - Controlador',
-        nombre,
-        edad
+        usuario
     });
 };
 
@@ -38,6 +62,7 @@ const usuariosDelete = (req, res = response) => {
         msg: 'delete API - Controlador'
     });
 };
+
 const usuariosPatch = (req, res = response) => {
     res.json({
         msg: 'patch API - Controlador'
@@ -49,6 +74,6 @@ module.exports = {
     usuariosGet,
     usuariosPost,
     usuariosPut,
-    usuariosPatch,
-    usuariosDelete
+    usuariosDelete,
+    usuariosPatch
 }
