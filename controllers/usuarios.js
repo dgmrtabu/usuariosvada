@@ -3,19 +3,35 @@ const bcryptjs = require('bcryptjs');
 
 const Usuario = require('../model/usuario');
 
-const usuariosGet = (req = request, res = response) => {
-    const { q, nombre = 'No name', apikey, page = 1, limit = 10 } = req.query;
+const usuariosGet = async(req = request, res = response) => {
+
+    const { limite = 5, desde = 0 } = req.query;
+    const query = { estado: true };
+
+    /*     const usuarios = await Usuario.find(query)
+            .skip(Number(desde))
+            .limit(Number(limite));
+
+        const totalRegistros = await Usuario.countDocuments(query);
+
+        APLICACION DE PROMESA PARA REALIZAR CONSULTA SIMULTANEA
+     */
+
+    const [totalRegistros, usuarios] = await Promise.all([
+        Usuario.count(query),
+        Usuario.find(query)
+        .skip(Number(desde))
+        .limit(Number(limite))
+    ]);
+
     res.json({
-        msg: 'get API - Controlador',
-        q,
-        nombre,
-        apikey,
-        page,
-        limit
+        totalRegistros,
+        usuarios,
+        // resp
     });
 };
 
-const usuariosPost = async(req, res = response) => {
+const usuariosPost = async(req = request, res = response) => {
 
     const { nombre, correo, password, rol } = req.body;
     const usuario = new Usuario({ nombre, correo, password, rol });
@@ -32,7 +48,7 @@ const usuariosPost = async(req, res = response) => {
     });
 };
 
-const usuariosPut = async(req, res = response) => {
+const usuariosPut = async(req = request, res = response) => {
 
     const { usuarioId } = req.params;
 
@@ -47,19 +63,23 @@ const usuariosPut = async(req, res = response) => {
 
     const usuario = await Usuario.findByIdAndUpdate(usuarioId, lodemas);
 
-    res.json({
-        msg: 'put API - Controlador',
-        usuario
-    });
+    res.json(usuario);
 };
 
-const usuariosDelete = (req, res = response) => {
-    res.json({
-        msg: 'delete API - Controlador'
-    });
+const usuariosDelete = async(req = request, res = response) => {
+
+    const { usuarioId } = req.params;
+
+    // Borrado Fisicamente
+    //const usuario = await Usuario.findByIdAndDelete(usuarioId);
+
+    // Borrado Logico
+    const usuario = await Usuario.findByIdAndUpdate(usuarioId, { estado: false })
+
+    res.json(usuario);
 };
 
-const usuariosPatch = (req, res = response) => {
+const usuariosPatch = (req = request, res = response) => {
     res.json({
         msg: 'patch API - Controlador'
     });
@@ -72,4 +92,4 @@ module.exports = {
     usuariosPut,
     usuariosDelete,
     usuariosPatch
-}
+};
