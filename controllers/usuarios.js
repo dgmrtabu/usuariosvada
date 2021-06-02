@@ -66,18 +66,16 @@ const usuariosPut = async(req = request, res = response) => {
     res.json(usuario);
 };
 
-const usuariosDelete = async(req = request, res = response) => {
+const usuariosDelete = async(req = request , res = response) => {
 
     const { usuarioId } = req.params;
 
-    // Borrado Fisicamente
-    //const usuario = await Usuario.findByIdAndDelete(usuarioId);
 
-    // Borrado Logico
-    const usuario = await Usuario.findByIdAndUpdate(usuarioId, { estado: false })
+    const usuario = await Usuario.findByIdAndUpdate(usuarioId, { estado: false });
+    const usuarioAutenticado = req.usuario;
 
-    res.json(usuario);
-};
+    res.json({usuario,usuarioAutenticado});
+}
 
 const usuariosPatch = (req = request, res = response) => {
     res.json({
