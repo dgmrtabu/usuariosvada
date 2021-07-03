@@ -1,33 +1,32 @@
 const { response, request } = require('express');
 const { Categoria, } = require('../model');
-const bcryptjs = require('bcryptjs');
 
 // obternerCategorias - Paginado - total -populate
-const obternerCategorias = async(req = request, res = response)=>{
-    const { limite = 5, desde = 0} = req.query;
-    const query = {  estado: true };
+const obternerCategorias = async(req = request, res = response) => {
+    const { limite = 5, desde = 0 } = req.query;
+    const query = { estado: true };
 
     const [totalRegistros, categorias] = await Promise.all([
         Categoria.countDocuments(query),
         Categoria.find(query)
-            .populate('usuario', 'nombre')
-            .skip(Number(desde))
-            .limit(Number(limite))
+        .populate('usuario', 'nombre')
+        .skip(Number(desde))
+        .limit(Number(limite))
     ]);
 
     res.json({
         totalRegistros,
         categorias
     });
-}
+};
 // obternerCategoria - populate {}
-const obternerCategoria = async( req= request, res = response)=>{
-    const {id} = req.params;
+const obternerCategoria = async(req = request, res = response) => {
+    const { id } = req.params;
 
     const categoria = await Categoria.findById(id).populate('usuario', 'nombre');
 
     res.json(categoria);
-}
+};
 
 const crearCategoria = async(req, res = response) => {
 
@@ -53,12 +52,12 @@ const crearCategoria = async(req, res = response) => {
 
     res.status(201).json(categoria);
 
-}
+};
 
 // actualizarCategoria
 
 const actualizarCategoria = async(req = request, res = response) => {
-    
+
     const { id } = req.params;
 
     const { estado, usuario, ...dataCat } = req.body;
@@ -68,17 +67,17 @@ const actualizarCategoria = async(req = request, res = response) => {
     dataCat.nombre = dataCat.nombre.toUpperCase();
     dataCat.usuario = req.usuario._id;
 
-    const categoria = await Categoria.findByIdAndUpdate(id, dataCat, { new: true});
+    const categoria = await Categoria.findByIdAndUpdate(id, dataCat, { new: true });
     console.log(categoria);
 
     res.json(categoria);
-}
+};
 
 //borrarCategoria - estado:false
 
-const borrarCategoria = async( req = request, res = response)=>{
+const borrarCategoria = async(req = request, res = response) => {
     const { id } = req.params;
-    const categoriaBorrada = await Categoria.findByIdAndUpdate(id, {estado: false}, {new:true});
+    const categoriaBorrada = await Categoria.findByIdAndUpdate(id, { estado: false }, { new: true });
 
     res.json(categoriaBorrada);
 }
