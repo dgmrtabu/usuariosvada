@@ -33,6 +33,51 @@ const buscarUsuarios = async(termino = '', res = response) => {
 
 };
 
+const buscarProductos = async(termino = '', res = response) => {
+
+    const esMongoId = ObjectId.isValid(termino); // Retorna u TRUE
+
+    if (esMongoId) {
+        const producto = await Producto.findById(termino).populate('categoria', 'nombre');
+        return res.json({
+            results: (producto) ? [producto] : []
+        });
+    }
+
+    const regex = new RegExp(termino, 'i');
+
+    const productos = await Producto.find({
+        nombre: regex,
+        $and: [{ estado: true }]
+    }).populate('categoria', 'nombre');
+
+    res.json({
+        results: productos
+    });
+};
+
+const buscarCategorias = async(termino = '', res = response) => {
+
+    const esMongoId = ObjectId.isValid(termino); // Retorna u TRUE
+
+    if (esMongoId) {
+        const categoria = await Categoria.findById(termino);
+        return res.json({
+            results: (categoria) ? [categoria] : []
+        });
+    }
+
+    const regex = new RegExp(termino, 'i');
+
+    const categorias = await Categoria.find({
+        nombre: regex,
+        $and: [{ estado: true }]
+    });
+
+    res.json({
+        results: categorias
+    });
+};
 
 const buscar = (req = request, res = response) => {
 
@@ -49,8 +94,10 @@ const buscar = (req = request, res = response) => {
             buscarUsuarios(termino, res);
             break;
         case 'categorias':
+            buscarCategorias(termino, res);
             break;
         case 'productos':
+            buscarProductos(termino, res);
             break;
 
         default:
