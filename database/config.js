@@ -13,7 +13,7 @@ const dbConnection = async() => {
         });
         console.log('Base de datos online...');
     } catch (error) {
-        throw new Error('Error a la hora de iniciar la BD...');
+        throw new Error('Error a la hora de iniciar la BD....');
     }
 
 };
