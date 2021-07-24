@@ -1,5 +1,5 @@
 const { response, request } = require('express');
-const { Producto } = require('../model');
+const { Producto } = require('../models');
 
 
 // obternerCProductos - Paginado - total -populate

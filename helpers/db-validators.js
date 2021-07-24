@@ -1,5 +1,5 @@
-const { Usuario, Categoria, Producto } = require('../model');
-const Role = require('../model/role');
+const { Usuario, Categoria, Producto } = require('../models');
+const Role = require('../models/role');
 // const Usuario = require('../model/usuario');
 
 const esRolValido = async(rol = '') => {
@@ -41,11 +41,22 @@ const existeProductoPorId = async(id) => {
     }
 };
 
+//Validar colecciones permitidas
+
+const coleccionesPermitidas = (coleccion = '', colecciones = []) => {
+
+    const incluida = colecciones.includes(coleccion);
+    if (!incluida) {
+        throw new Error(`La coleccion ${ coleccion } no es permitida, las colecciones permitidas son: ${colecciones}`);
+    }
+    return true;
+};
 
 module.exports = {
     esRolValido,
     correoNoRepetido,
     existeUsuarioPorId,
     existeCategoriaPorId,
-    existeProductoPorId
+    existeProductoPorId,
+    coleccionesPermitidas
 };

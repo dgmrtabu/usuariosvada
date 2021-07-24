@@ -1,5 +1,5 @@
 const { response, request } = require('express');
-const { Categoria, } = require('../model');
+const { Categoria, } = require('../models');
 
 // obternerCategorias - Paginado - total -populate
 const obternerCategorias = async(req = request, res = response) => {
