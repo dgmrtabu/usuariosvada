@@ -1,14 +1,12 @@
+const path = require('path');
+const fs = require('fs');
+
 const { response, request } = require('express');
 const { subirArchivo } = require('../helpers');
 
 const { Usuario, Producto } = require('../models')
 
 const cargarArchivo = async(req, res = response) => {
-
-    if (!req.files || Object.keys(req.files).length === 0 || !req.files.archivo) {
-        res.status(400).send({ msg: 'No hay archivos que subir' });
-        return;
-    }
 
     try {
 
@@ -51,6 +49,16 @@ const actualizarImagen = async(req = request, res = response) => {
         default:
             return res.status(500).json({ msg: 'Se me olvido validar esto' });
             break;
+    }
+
+
+    // Borrar imagenes previas
+    if (modelo.img) {
+        // hay que borrar la imagen del servidor
+        const pathImagen = path.join(__dirname, '../uploads', coleccion, modelo.img);
+        if (fs.existsSync(pathImagen)) {
+            fs.unlinkSync(pathImagen);
+        }
     }
 
     const nombre = await subirArchivo(req.files, undefined, coleccion);
