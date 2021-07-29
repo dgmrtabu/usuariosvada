@@ -1,4 +1,6 @@
 /node_modules
-/uploads
 
 .env
+
+uploads/productos/**.*
+uploads/usuarios/**.*
